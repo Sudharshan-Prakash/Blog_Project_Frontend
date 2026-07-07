@@ -3,9 +3,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios"
 import Footer from './common/Footer';
+import { auth } from '../config/firebase'; // Import the auth instance from your firebase config
 function Blogs() {
 
     const [blogs, setBlogs] = useState([]);
+    const [admin, setAdmin] = useState(false);
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -15,6 +17,17 @@ function Blogs() {
         }).catch(() => {
             console.log("Error fetching data")
         })
+
+         auth.onAuthStateChanged((user) => {
+                if (user) {
+                  if(user.uid=== "q6j9YhiyC4PoAzvISN1aXPO73O13"){
+                    setAdmin(true)
+                  }
+                } else {
+                  // User is signed out, you can handle this case as needed
+                  setAdmin(false)
+                }
+            })
     }, [])
 
 
@@ -70,8 +83,7 @@ function Blogs() {
         <div className="blog-section py-14">
             <h2 className="text-center text-5xl font-bold mb-14">Latest  <span className='text-orange-400'>Blogs</span> 📚</h2>
 
-            {/* Blog creation form */}
-            <div className="blog-creation-form mb-8" style={{ width: "80%", margin: "auto" }}>
+            {admin?<div className="blog-creation-form mb-8" style={{ width: "80%", margin: "auto" }}>
                 <form onSubmit={handleNewBlogSubmit} className="flex flex-col gap-4">
                     <input
                         type="text"
@@ -93,7 +105,8 @@ function Blogs() {
                         Add Blog
                     </button>
                 </form>
-            </div>
+            </div>: ""}
+            
 
             <div className="blogs-container grid grid-cols-1 md:grid-cols-2 gap-6 container mx-auto px-4">
                 {blogs.map((blog) => (
